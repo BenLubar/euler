@@ -14,7 +14,11 @@
 // Evaluate the sum of all the amicable numbers under 10000.
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/BenLubar/memoize"
+)
 
 func main() {
 	var sum int
@@ -33,13 +37,7 @@ func isAmicable(a int) bool {
 	return a != b && a == d(b)
 }
 
-var cache = make(map[int]int)
-
-func d(n int) int {
-	if c, ok := cache[n]; ok {
-		return c
-	}
-
+var d = memoize.Memoize(func(n int) int {
 	var sum int
 	for i := 1; i < n; i++ {
 		if n%i == 0 {
@@ -47,6 +45,5 @@ func d(n int) int {
 		}
 	}
 
-	cache[n] = sum
 	return sum
-}
+}).(func(n int) int)

@@ -6,30 +6,25 @@
 // How many such routes are there through a 20×20 grid?
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/BenLubar/memoize"
+)
 
 func main() {
 	fmt.Println(paths(20, 20))
 }
 
-var cache = make(map[[2]int]int)
+var paths func(w, h int) int
 
-func paths(w, h int) int {
-	if w == 0 || h == 0 {
-		return 1
-	}
-	if n, ok := cache[pair(w, h)]; ok {
+func init() {
+	paths = memoize.Memoize(func(w, h int) int {
+		if w == 0 || h == 0 {
+			return 1
+		}
+
+		n := paths(w-1, h) + paths(w, h-1)
 		return n
-	}
-
-	n := paths(w-1, h) + paths(w, h-1)
-	cache[pair(w, h)] = n
-	return n
-}
-
-func pair(i, j int) [2]int {
-	if i < j {
-		i, j = j, i
-	}
-	return [2]int{i, j}
+	}).(func(w, h int) int)
 }

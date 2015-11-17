@@ -34,7 +34,11 @@
 // and requires a clever method! ;o)
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/BenLubar/memoize"
+)
 
 var triangle = [][]int{
 	{75},
@@ -60,22 +64,21 @@ func main() {
 
 var cache = make(map[[2]int]int)
 
-func compute(x, y int) int {
-	if y >= len(triangle) {
-		return 0
-	}
+var compute func(x, y int) int
 
-	if c, ok := cache[[2]int{x, y}]; ok {
-		return c
-	}
+func init() {
+	compute = memoize.Memoize(func(x, y int) int {
+		if y >= len(triangle) {
+			return 0
+		}
 
-	n := compute(x, y+1)
-	if m := compute(x+1, y+1); m > n {
-		n = m
-	}
+		n := compute(x, y+1)
+		if m := compute(x+1, y+1); m > n {
+			n = m
+		}
 
-	n += triangle[y][x]
+		n += triangle[y][x]
 
-	cache[[2]int{x, y}] = n
-	return n
+		return n
+	}).(func(x, y int) int)
 }
